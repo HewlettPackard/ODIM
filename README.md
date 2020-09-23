@@ -6,7 +6,7 @@
 ### Prerequisites
 Ensure that the Internet is available. If your system is behind a corporate proxy or firewall, set your proxy configuration. To set proxy, refer `https://www.serverlab.ca/tutorials/linux/administration-linux/how-to-set-the-proxy-for-apt-for-ubuntu-18-04/`.  
 
-
+Test1
 ### Procedure
 1. Download and install `Ubuntu 18.04 LTS` on your system.
     >   **NOTE:**  Before installation, configure your system IP to access the                data center network.
@@ -108,8 +108,8 @@ To install `Ubuntu Make`, run the following command:
 This section provides a step-by-step procedure for deploying the resource aggregator for ODIM (odimra) and GRF plugin.
 
 > **NOTE:**
-  • All configuration parameters are set to default values in the configuration files for odimra and GRF plugin. 
-  • The following ports are used for deploying odimra and GRF plugin:
+  â€¢ All configuration parameters are set to default values in the configuration files for odimra and GRF plugin. 
+  â€¢ The following ports are used for deploying odimra and GRF plugin:
     45000, 45001, 45101-45110, 9092, 9082, 6380, 6379, 8500, 8300, 8302, 8301, 8600
     Ensure that the above ports are not in use.
 
