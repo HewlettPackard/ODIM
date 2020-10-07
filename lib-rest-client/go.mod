@@ -1,4 +1,4 @@
-module github.com/ODIM-Project/ODIM/svc-plugin-rest-client
+module github.com/ODIM-Project/ODIM/lib-rest-client
 
 go 1.13
 
