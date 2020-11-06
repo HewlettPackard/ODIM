@@ -57,6 +57,8 @@ func Router() *iris.Application {
 		RemoveElementsFromAggregateRPC:          rpc.DoRemoveElementsFromAggregate,
 		ResetAggregateElementsRPC:               rpc.DoResetAggregateElements,
 		SetDefaultBootOrderAggregateElementsRPC: rpc.DoSetDefaultBootOrderAggregateElements,
+		GetAllConnectionMethodsRPC:              rpc.DoGetAllConnectionMethods,
+		GetConnectionMethodRPC:                  rpc.DoGetConnectionMethod,
 	}
 
 	s := handle.SessionRPCs{
@@ -222,6 +224,8 @@ func Router() *iris.Application {
 	systems.Get("/{id}/LogServices/{rid}/Entries/{rid2}", system.GetSystemResource)
 	systems.Post("/{id}/LogServices/{rid}/Actions/LogService.ClearLog", system.GetSystemResource)
 	systems.Patch("/{id}", system.ChangeBootOrderSettings)
+	systems.Get("/{id}/PCIeDevices/{rid}", system.GetSystemResource)
+	systems.Any("/{id}/PCIeDevices/{rid}", handle.SystemsMethodNotAllowed)
 	systems.Any("/", handle.SystemsMethodNotAllowed)
 	systems.Any("/{id}", handle.SystemsMethodNotAllowed)
 	systems.Any("/{id}/EthernetInterfaces", handle.SystemsMethodNotAllowed)
@@ -283,6 +287,12 @@ func Router() *iris.Application {
 	aggregationSource.Delete("/{id}", pc.DeleteAggregationSource)
 	aggregationSource.Any("/{id}", handle.AggMethodNotAllowed)
 
+	connectionMethods := aggregation.Party("/ConnectionMethods", middleware.SessionDelMiddleware)
+	connectionMethods.Get("/", pc.GetAllConnectionMethods)
+	connectionMethods.Get("/{id}", pc.GetConnectionMethod)
+	connectionMethods.Any("/", handle.AggMethodNotAllowed)
+	connectionMethods.Any("/{id}", handle.AggMethodNotAllowed)
+
 	aggregates := aggregation.Party("/Aggregates", middleware.SessionDelMiddleware)
 	aggregates.Post("/", pc.CreateAggregate)
 	aggregates.Get("/", pc.GetAggregateCollection)
@@ -304,6 +314,7 @@ func Router() *iris.Application {
 	chassis.Get("/", cha.GetChassisCollection)
 	chassis.Get("/{id}", cha.GetChassis)
 	chassis.Get("/{id}/NetworkAdapters", cha.GetChassisResource)
+	chassis.Get("/{id}/NetworkAdapters/{rid}", cha.GetChassisResource)
 	chassis.Any("/", handle.ChassisMethodNotAllowed)
 	chassis.Any("/{id}", handle.ChassisMethodNotAllowed)
 	chassis.Any("/{id}/NetworkAdapters", handle.ChassisMethodNotAllowed)
