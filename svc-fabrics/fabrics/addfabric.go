@@ -17,14 +17,15 @@ package fabrics
 
 import (
 	"fmt"
+	"net"
+	"net/http"
+	"strings"
+
 	"github.com/ODIM-Project/ODIM/lib-utilities/common"
 	fabricsproto "github.com/ODIM-Project/ODIM/lib-utilities/proto/fabrics"
 	"github.com/ODIM-Project/ODIM/lib-utilities/response"
 	"github.com/ODIM-Project/ODIM/svc-fabrics/fabmodel"
 	log "github.com/sirupsen/logrus"
-	"net"
-	"net/http"
-	"strings"
 )
 
 //AddFabric holds the logic for Adding fabric
@@ -63,8 +64,11 @@ func AddFabric(req *fabricsproto.AddFabricRequest) response.RPC {
 				[]interface{}{"IP Address", plugin.IP}, nil)
 		}
 		deviceIPAddress := fmt.Sprintf("%v", addr[0])
-
-		if deviceIPAddress == address {
+		// plugins deployed in k8s will use servicename for connecting,
+		// and the same is used while adding plugin, hence will check
+		// for both resolved IP address as well service name, when
+		// comparing with the stored plugin address.
+		if deviceIPAddress == address || plugin.IP == address {
 			pluginID = plugin.ID
 			break
 		}

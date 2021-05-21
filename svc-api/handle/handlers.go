@@ -18,10 +18,11 @@ package handle
 import (
 	"encoding/json"
 	"encoding/xml"
-	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/ODIM-Project/ODIM/lib-utilities/common"
 	"github.com/ODIM-Project/ODIM/lib-utilities/config"
@@ -830,6 +831,10 @@ func (r *Registry) GetRegistryFileCollection(ctx iris.Context) {
 func (r *Registry) GetMessageRegistryFileID(ctx iris.Context) {
 	sessionToken := ctx.Request().Header.Get("X-Auth-Token")
 	regFileID := ctx.Params().Get("id")
+	if strings.Contains(regFileID, ".json") {
+		r.GetMessageRegistryFile(ctx)
+		return
+	}
 	if strings.HasPrefix(regFileID, "#") {
 		reqURI := ctx.Request().RequestURI
 		// Fetch Registry file ID from request URI
@@ -887,7 +892,7 @@ func (r *Registry) GetMessageRegistryFileID(ctx iris.Context) {
 	regFileNames = append(regFileNames, regFileKeys...)
 	for _, regFile := range regFileNames {
 		if reqRegistryFileName == regFile {
-			locationURI = "/redfish/v1/registries/" + regFile
+			locationURI = "/redfish/v1/Registries/" + regFile
 			break
 		}
 	}
