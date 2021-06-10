@@ -929,6 +929,11 @@ func validateFields(request *evmodel.RequestBody) (int32, string, []interface{},
 			return http.StatusBadRequest, errResponse.PropertyValueNotInList, []interface{}{key, "EventType"}, fmt.Errorf("Unsupported EventType")
 		}
 	}
+	if request.EventFormatType == "MetricReport" {
+		if len(request.EventTypes) > 1 {
+			return http.StatusBadRequest, errResponse.PropertyValueFormatError, []interface{}{"EventTypes","EventType"}, fmt.Errorf("Unsupported EventType")
+		}
+	}
 
 	if request.SubscriptionType == "" {
 		request.SubscriptionType = evmodel.SubscriptionType
