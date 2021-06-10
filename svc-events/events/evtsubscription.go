@@ -931,7 +931,10 @@ func validateFields(request *evmodel.RequestBody) (int32, string, []interface{},
 	}
 	if request.EventFormatType == "MetricReport" {
 		if len(request.EventTypes) > 1 {
-			return http.StatusBadRequest, errResponse.PropertyValueFormatError, []interface{}{"EventTypes","EventType"}, fmt.Errorf("Unsupported EventType")
+			return http.StatusBadRequest, errResponse.PropertyValueFormatError, []interface{}{"EventTypes", "EventType"}, fmt.Errorf("Unsupported EventType")
+		}
+		if request.EventTypes[0] != "MetricReport" {
+			return http.StatusBadRequest, errResponse.PropertyValueNotInList, []interface{}{request.EventTypes[0], "EventType"}, fmt.Errorf("Unsupported EventType")
 		}
 	}
 
