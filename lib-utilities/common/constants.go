@@ -272,11 +272,3 @@ type DeviceSubscription struct {
 	OriginResources []string `json:"OriginResources"`
 	Location        string   `json:"location,omitempty"`
 }
-
-// PluginStatusEvent contains details of the plugin status
-type PluginStatusEvent struct {
-	Name         string `json:"Name"`
-	Type         string `json:"Type"`
-	Timestamp    string `json:"Timestamp"`
-	OriginatorID string `json:"OriginatorID"`
-}

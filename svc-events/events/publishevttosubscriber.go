@@ -73,15 +73,21 @@ func PublishEventsToDestination(data interface{}) bool {
 		log.Info("error: invalid input params")
 		return false
 	}
+
 	event := data.(common.Events)
 	var requestData = string(event.Request)
 	//replacing the resposne with north bound translation URL
 	for key, value := range config.Data.URLTranslation.NorthBoundURL {
 		requestData = strings.Replace(requestData, key, value, -1)
 	}
-	if event.EventType == "MetricReport" {
-		result := publishMetricReport(requestData)
-		return result
+
+	switch event.EventType {
+	case "PluginStartUp":
+		log.Info("received plugin started event from ", event.IP)
+		go callPluginStartUp(event)
+		return true
+	case "MetricReport":
+		return publishMetricReport(requestData)
 	}
 
 	// Extract the Hostname/IP of the event source and Event from input parameter
@@ -98,12 +104,6 @@ func PublishEventsToDestination(data interface{}) bool {
 	if err = json.Unmarshal([]byte(requestData), &message); err != nil {
 		log.Error("failed to unmarshal the incoming event: ", requestData, " with the error: ", err.Error())
 		return false
-	}
-
-	if len(message.Events) == 1 && strings.EqualFold("PluginStarted", message.Events[0].EventType) {
-		log.Info("received plugin started event from ", event.IP)
-		go callPluginStartUp(event.IP, message.Events[0].OriginOfCondition.Oid)
-		return true
 	}
 
 	addFabric(requestData, host)
@@ -424,16 +424,23 @@ func updateSystemPowerState(systemUUID, systemURI, state string) {
 	return
 }
 
-func callPluginStartUp(managerAddr, originURI string) {
-	aggregator := aggregatorproto.NewAggregatorService(services.Aggregator, services.Service.Client())
-	_, err := aggregator.SendStartUpData(context.TODO(), &aggregatorproto.SendStartUpDataRequest{
-		PluginAddr: managerAddr,
-		OriginURI:  originURI,
-	})
-	if err != nil {
-		log.Error("failed to send plugin startup data to " + managerAddr + ": " + err.Error())
+func callPluginStartUp(event common.Events) {
+	var message common.PluginStatusEvent
+	if err := json.Unmarshal([]byte(event.Request), &message); err != nil {
+		log.Error("failed to unmarshal the plugin startup event from "+event.IP+
+			" with the error: ", err.Error())
 		return
 	}
-	log.Info("successfully sent plugin startup data to " + managerAddr)
+
+	aggregator := aggregatorproto.NewAggregatorService(services.Aggregator, services.Service.Client())
+	_, err := aggregator.SendStartUpData(context.TODO(), &aggregatorproto.SendStartUpDataRequest{
+		PluginAddr: event.IP,
+		OriginURI:  message.OriginatorID,
+	})
+	if err != nil {
+		log.Error("failed to send plugin startup data to " + event.IP + ": " + err.Error())
+		return
+	}
+	log.Info("successfully sent plugin startup data to " + event.IP)
 	return
 }
